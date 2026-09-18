@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GLUT ME | Экспресс-тест кожи и подбор схемы ухода</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+--bg: #F4F7F8;
+--bg-deep: #E8EFF2;
+--card: #FFFFFF;
+--ink: #0E171B;
+--ink-soft: #4D5E66;
+--tiffany: #00B8A9;
+--tiffany-neon: #00E5D2;
+--tiffany-deep: #00877C;
+--tiffany-soft: rgba(0, 184, 169, 0.12);
+--mercury: #9EACB5;
+--mercury-light: #E4EBEE;
+--line: #D5E0E5;
+--silver-gradient: linear-gradient(135deg, #FFFFFF 0%, #E9EFF2 50%, #C9D6DC 100%);
+--shadow-luxury: 0 16px 36px -18px rgba(14, 23, 27, 0.18);
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+margin:0;background:var(--bg);color:var(--ink);
+font-family:"Plus Jakarta Sans",system-ui,sans-serif;
+font-size:17.5px;line-height:1.6;-webkit-font-smoothing:antialiased;
+min-height:100vh;display:flex;flex-direction:column;
+}
+.topbar{border-bottom:1px solid var(--line);background:rgba(255,255,255,0.9);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50}
+.topbar .wrap{max-width:640px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:19px;letter-spacing:.03em;color:var(--ink)}
+.brand span{color:var(--tiffany)}
+.readers{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--tiffany-deep);background:var(--tiffany-soft);padding:4px 10px;border-radius:20px}
+
+main{flex:1}
+.stage{max-width:620px;margin:0 auto;width:100%;padding:36px 20px 70px}
+.eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--tiffany-deep);text-align:center;margin:0 0 14px}
+.hook{font-family:"Fraunces",Georgia,serif;font-weight:500;color:var(--ink);font-size:clamp(23px,4.8vw,32px);line-height:1.24;text-align:center;margin:0 0 22px}
+.hook .em{font-style:italic;color:var(--tiffany)}
+.intro-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px;box-shadow:var(--shadow-luxury)}
+.bullets{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.bullets li{font-size:15px;color:var(--ink-soft);display:flex;gap:12px;align-items:center}
+.bullets li .ck{flex:0 0 auto;width:24px;height:24px;border-radius:50%;background:var(--tiffany-soft);color:var(--tiffany-deep);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,184,169,0.3)}
+.divider{height:1px;background:var(--line);margin:26px 0}
+
+.q-title{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:clamp(22px,4.8vw,29px);line-height:1.25;text-align:center;margin:0 0 24px}
+.options{display:flex;flex-direction:column;gap:12px}
+.option{
+display:block;width:100%;cursor:pointer;text-align:left;line-height:1.4;
+background:var(--card);border:1px solid var(--line);border-radius:14px;
+padding:18px 20px;font:inherit;font-size:16px;color:var(--ink);
+transition:all .18s ease;
+}
+.option:hover{border-color:var(--tiffany);transform:translateY(-1px);box-shadow:0 8px 20px -10px rgba(0,184,169,.35)}
+.option.selected{border-color:var(--tiffany);background:#EEF8F7;box-shadow:0 10px 24px -12px rgba(0,184,169,.4)}
+
+.info-title{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:clamp(22px,4.8vw,30px);line-height:1.22;margin:0 0 18px;text-align:center}
+.info-body{font-size:17.5px;color:var(--ink-soft);line-height:1.6;margin:0 auto 34px;max-width:38ch;text-align:center}
+.btn-primary{
+display:block;width:100%;max-width:440px;margin:0 auto;cursor:pointer;border:none;
+background:linear-gradient(135deg, var(--tiffany) 0%, var(--tiffany-deep) 100%);
+color:#FFFFFF;font:inherit;font-weight:600;font-size:15.5px;
+padding:18px 26px;border-radius:14px;letter-spacing:.04em;text-transform:uppercase;
+box-shadow:0 12px 26px -10px rgba(0,184,169,.5);
+transition:all .15s ease;
+}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 16px 32px -10px rgba(0,184,169,.7)}
+
+.loader-area{padding-top:40px;display:flex;flex-direction:column;align-items:center;gap:20px;text-align:center}
+.loader-spin{width:46px;height:46px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--tiffany);animation:spin .8s linear infinite}
+.loader-title{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:clamp(19px,4.4vw,24px);color:var(--ink);margin:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.analyze-area{padding-top:14px;text-align:center}
+.analyze-title{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:clamp(22px,4.8vw,29px);margin:0 0 32px}
+.analyze-list{display:flex;flex-direction:column;gap:14px;text-align:left;margin:0 auto;max-width:480px;width:100%}
+.a-item{display:flex;gap:14px;align-items:center;font-size:15px;color:var(--ink-soft);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;transition:all .3s ease}
+.a-item .ic{flex:0 0 auto;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.a-item .chk{color:var(--tiffany-deep);font-weight:700;font-size:13px;opacity:0}
+.a-item.pending{opacity:.45}
+.a-item.pending .ic{border:1.5px solid var(--line)}
+.a-item.loading{opacity:1;color:var(--ink);border-color:var(--tiffany);box-shadow:0 8px 24px -15px rgba(0,184,169,.5)}
+.a-item.loading .ic{border:2px solid rgba(0,184,169,.25);border-top-color:var(--tiffany);animation:spin .8s linear infinite}
+.a-item.done{opacity:1;color:var(--ink)}
+.a-item.done .ic{background:var(--tiffany-soft)}
+.a-item.done .chk{opacity:1}
+
+.result-area{text-align:center}
+.result-title{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:clamp(23px,4.8vw,31px);line-height:1.2;margin:0 0 14px}
+.result-text{font-size:17px;color:var(--ink-soft);line-height:1.55;margin:0 auto 26px;max-width:42ch}
+.r-cards{display:grid;grid-template-columns:1fr;gap:12px;margin:0 0 26px}
+.r-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;text-align:left;box-shadow:0 4px 14px -10px rgba(15,23,27,.08)}
+.r-card .r-head{display:flex;align-items:center;gap:8px;margin:0 0 6px}
+.r-card .r-ic{color:var(--tiffany);flex:0 0 auto}
+.r-label{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--tiffany-deep);margin:0}
+.r-value{font-weight:600;font-size:16px;color:var(--ink);line-height:1.35;margin:0}
+@media (min-width:560px){.r-cards{grid-template-columns:1fr 1fr;gap:14px}}
+
+.t-kicker{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:clamp(23px,4.8vw,31px);line-height:1.2;text-align:center;margin:0 0 14px}
+.t-text{font-size:17px;color:var(--ink-soft);line-height:1.55;text-align:center;margin:0 auto 26px;max-width:38ch}
+.t-divider{height:1px;background:var(--line);margin:0 0 26px}
+.t-list{display:flex;flex-direction:column;gap:16px;margin:0 0 30px}
+.t-row{display:flex;flex-direction:column;gap:10px}
+.t-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 18px}
+.t-eyebrow{display:block;font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin:0 0 6px;color:var(--mercury)}
+.t-card.t-new .t-eyebrow{color:var(--tiffany-deep)}
+.t-line{display:flex;gap:10px;align-items:flex-start;line-height:1.35}
+.t-line .mk{flex:0 0 auto;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.mk-now{border:1.5px solid var(--line);background:#F9FBFC}
+.mk-new{background:var(--tiffany-soft);color:var(--tiffany-deep);font-weight:700;font-size:11px}
+.t-now .t-txt{color:var(--ink-soft);font-size:15px}
+.t-new .t-txt{color:var(--ink);font-weight:600;font-size:15px}
+.t-arrow{align-self:center;width:34px;height:34px;border-radius:50%;background:var(--tiffany);color:#FFFFFF;display:flex;align-items:center;justify-content:center;transform:rotate(90deg);box-shadow:0 6px 14px -4px rgba(0,184,169,.5)}
+@media (min-width:560px){
+.t-row{flex-direction:row;align-items:stretch;gap:14px}
+.t-card{flex:1}
+.t-arrow{transform:none}
+}
+
+/* СХЕМА УХОДА */
+#sellArea .section{padding:50px 0}
+#sellArea .sec-alt{background:var(--bg-deep)}
+#sellArea .wrap{max-width:720px;margin:0 auto;padding:0 20px}
+#sellArea h2{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:clamp(25px,4.5vw,36px);line-height:1.18;color:var(--ink);text-align:center;margin:0 0 12px}
+.sub-title{text-align:center;font-size:16px;color:var(--ink-soft);margin:0 0 34px;line-height:1.5}
+
+.protocol-chain{display:flex;flex-direction:column;gap:24px}
+.protocol-card{
+background:var(--card);border:1px solid var(--line);border-radius:18px;
+padding:22px;box-shadow:var(--shadow-luxury);
+display:flex;flex-direction:column;gap:18px;position:relative;
+}
+.protocol-badge{
+position:absolute;top:-12px;left:20px;
+background:linear-gradient(135deg, var(--tiffany) 0%, var(--tiffany-deep) 100%);
+color:#FFF;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+padding:4px 12px;border-radius:20px;box-shadow:0 6px 16px -6px rgba(0,184,169,.5);
+}
+.card-content{display:flex;flex-direction:column;gap:18px}
+.p-image{
+width:100%;max-width:180px;aspect-ratio:1/1;margin:0 auto;
+background-color:#EBF1F4;background-size:contain;background-position:center;background-repeat:no-repeat;
+border-radius:14px;border:1px solid var(--line);
+}
+.img-wash{background-image:url('./step1-wash.jpg'), var(--silver-gradient)}
+.img-toner{background-image:url('./step2-toner.jpg'), var(--silver-gradient)}
+.img-serum-antiage{background-image:url('./step3-serum-antiage.jpg'), var(--silver-gradient)}
+.img-serum-acne{background-image:url('./step3-serum-acne.jpg'), var(--silver-gradient)}
+.img-cream{background-image:url('./step4-cream.jpg'), var(--silver-gradient)}
+.img-eye{background-image:url('./step-eye.jpg'), var(--silver-gradient)}
+
+.p-info{flex:1;display:flex;flex-direction:column;text-align:left}
+.p-step-num{font-size:12px;font-weight:700;color:var(--tiffany-deep);letter-spacing:.1em;text-transform:uppercase;margin:0 0 4px}
+.p-title{font-family:"Fraunces",Georgia,serif;font-size:20px;font-weight:600;color:var(--ink);margin:0 0 6px;line-height:1.25}
+.p-desc{font-size:14.5px;color:var(--ink-soft);line-height:1.45;margin:0 0 12px}
+.p-why{background:#F3F8F9;border-left:3px solid var(--tiffany);padding:8px 12px;font-size:13.5px;color:var(--ink);border-radius:0 8px 8px 0;margin:0 0 14px}
+.p-why b{color:var(--tiffany-deep)}
+
+.p-buy{display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding-top:14px;margin-top:auto}
+.price-block{display:flex;flex-direction:column}
+.cur-price{font-size:22px;font-weight:700;color:var(--ink);line-height:1}
+.cur-price small{font-size:13px;font-weight:400;color:var(--mercury)}
+.btn-item{
+display:inline-flex;align-items:center;justify-content:center;gap:6px;
+background:var(--ink);color:#FFF;text-decoration:none;
+font-size:13.5px;font-weight:600;padding:12px 18px;border-radius:10px;
+transition:all .15s ease;
+}
+.btn-item:hover{background:var(--tiffany-deep);transform:translateY(-1px)}
+
+@media (min-width:600px){
+.card-content{flex-direction:row;align-items:center;gap:24px}
+.p-image{max-width:160px}
+}
+
+.total-summary{
+background:linear-gradient(135deg, #0E171B 0%, #1A2830 100%);color:#FFF;
+border-radius:20px;padding:28px 24px;text-align:center;margin-top:30px;
+box-shadow:0 20px 40px -20px rgba(14,23,27,.4);
+}
+.total-summary h3{font-family:"Fraunces",Georgia,serif;font-size:24px;font-weight:500;margin:0 0 10px;color:#FFF}
+.total-summary p{font-size:15px;color:var(--mercury-light);line-height:1.5;margin:0 0 20px;max-width:480px;margin-left:auto;margin-right:auto}
+.total-ozon-btn{
+display:inline-block;background:linear-gradient(135deg, var(--tiffany) 0%, var(--tiffany-neon) 100%);
+color:var(--ink);font-weight:700;font-size:16px;text-decoration:none;text-transform:uppercase;letter-spacing:.03em;
+padding:18px 36px;border-radius:12px;box-shadow:0 10px 24px -8px rgba(0,229,210,.6);
+transition:all .15s ease;
+}
+.total-ozon-btn:hover{transform:translateY(-2px);box-shadow:0 14px 30px -8px rgba(0,229,210,.8)}
+
+.site-footer{border-top:1px solid var(--line);background:#0B1013;color:#8E9FA8}
+.site-footer .wrap{max-width:640px;margin:0 auto;padding:30px 20px}
+.site-footer .f-links{display:flex;flex-wrap:wrap;gap:14px 20px;margin:0 0 12px}
+.site-footer a{color:#D5E1E6;font-size:13.5px;text-decoration:none}
+.site-footer a:hover{color:var(--tiffany-neon)}
+.site-footer .f-copy{font-size:12px;color:#6C7D87;margin:0 0 10px}
+.site-footer .f-disc{font-size:11.5px;line-height:1.55;color:#5D6D76;margin:0}
+.hidden{display:none!important}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+<div class="wrap">
+<div class="brand">GLUT<span>ME</span></div>
+<div class="readers">Бьюти-диагностика</div>
+</div>
+</div>
+
+<main>
+<div class="stage" id="stage">
+
+<!-- Интро блок -->
+<div class="intro-block" id="introBlock">
+<p class="eyebrow">Экспресс-тест · 1 минута</p>
+<h1 class="hook">Морщинки, высыпания или тусклость: <span class="em">узнай, на чём сделать</span> акцент в ежедневном уходе</h1>
+<div class="intro-card">
+<ul class="bullets">
+<li><span class="ck">✓</span> Определим главную потребность кожи: упругость, чистые поры или ровный тон</li>
+<li><span class="ck">✓</span> Подберём правильную последовательность ежедневных этапов под твои цели</li>
+<li><span class="ck">✓</span> 5 простых вопросов и персональный результат за 1 минуту без регистрации</li>
+</ul>
+</div>
+<div class="divider"></div>
+</div>
+
+<!-- Зона вопросов -->
+<div class="q-area" id="qArea">
+<h2 class="q-title" id="qTitle"></h2>
+<div class="options" id="qOptions"></div>
+</div>
+
+<!-- Лоадер -->
+<div class="loader-area hidden" id="loaderArea">
+<div class="loader-spin"></div>
+<h2 class="loader-title" id="loaderTitle"></h2>
+</div>
+
+<!-- Инфо-вставка -->
+<div class="info-area hidden" id="infoArea">
+<h2 class="info-title" id="infoTitle"></h2>
+<p class="info-body" id="infoBody"></p>
+<button class="btn-primary" id="infoBtn" type="button"></button>
+</div>
+
+<!-- Анализ -->
+<div class="analyze-area hidden" id="analyzeArea">
+<h2 class="analyze-title" id="analyzeTitle"></h2>
+<div class="analyze-list" id="analyzeList"></div>
+</div>
+
+<!-- Результат -->
+<div class="result-area hidden" id="resultArea">
+<h2 class="result-title" id="resultTitle"></h2>
+<p class="result-text" id="resultText"></p>
+<div class="r-cards" id="resultCards"></div>
+<button class="btn-primary result-btn" id="resultBtn" type="button"></button>
+</div>
+
+<!-- До / После -->
+<div class="transform-area hidden" id="transformArea">
+<p class="t-kicker" id="transformKicker"></p>
+<p class="t-text" id="transformText"></p>
+<div class="t-divider"></div>
+<div class="t-list" id="transformList"></div>
+<button class="btn-primary transform-btn" id="transformBtn" type="button"></button>
+</div>
+
+</div>
+
+<!-- СЕКЦИЯ ПРОГРАММЫ УХОДА И ПОКУПКИ СРЕДСТВ -->
+<div class="landing hidden" id="sellArea">
+
+<section class="section">
+<div class="wrap">
+<h2 id="sellTitle">Твоя персональная программа ухода GLUT ME</h2>
+<p class="sub-title" id="sellSubtitle">Средства подобраны по принципу биохимической синергии специально под профиль твоей кожи. Забирай средства по отдельности на Ozon в единую систему:</p>
+
+<div class="protocol-chain">
+
+<!-- ШАГ 1: ОЧИЩЕНИЕ -->
+<div class="protocol-card">
+<span class="protocol-badge">Шаг 01 · Физиологическое очищение</span>
+<div class="card-content">
+<div class="p-image img-wash"></div>
+<div class="p-info">
+<span class="p-step-num">Базовый этап для всех типов кожи</span>
+<h3 class="p-title">Пенка для умывания GLUT WASH (150 мл)</h3>
+<p class="p-desc">Обильная пена деликатно очищает кожу и поры без разрушения липидной мантии. Без сухости, шелушений и чувства «скрипа».</p>
+<div class="p-why">
+<b>Зачем в схеме:</b> Агрессивные ПАВ смывают защитные липиды, провоцируя обезвоженность и ранние морщины. GLUT WASH бережно сохраняет гидролипидный баланс.
+</div>
+<div class="p-buy">
+<div class="price-block">
+<span class="cur-price">~913 ₽ <small>Ozon</small></span>
+</div>
+<a href="https://ozon.ru/t/n6IqZYK" class="btn-item" target="_blank" rel="noopener">Купить на Ozon →</a>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ШАГ 2: ТОНИЗАЦИЯ И ПРОВОДНИК -->
+<div class="protocol-card">
+<span class="protocol-badge">Шаг 02 · Подготовка и проводник</span>
+<div class="card-content">
+<div class="p-image img-toner"></div>
+<div class="p-info">
+<span class="p-step-num">Этап гидратации</span>
+<h3 class="p-title">Увлажняющий тонер FRESH UP (150 мл)</h3>
+<p class="p-desc">Мгновенно восстанавливает здоровый pH после умывания, глубоко насыщает влагой и повышает проницаемость кожи для сыворотки.</p>
+<div class="p-why">
+<b>Зачем в схеме:</b> По сухой коже молекулы антиоксидантов не проникают вглубь. Тонер открывает аквапориновые каналы для максимального усвоения пептидов.
+</div>
+<div class="p-buy">
+<div class="price-block">
+<span class="cur-price">~947 ₽ <small>Ozon</small></span>
+</div>
+<a href="https://ozon.ru/t/cFMi93y" class="btn-item" target="_blank" rel="noopener">Купить на Ozon →</a>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ШАГ 3: ДИНАМИЧЕСКИЙ ШАГ (СЫВОРОТКА ANTI-AGE ИЛИ ACNE STOP) -->
+<div class="protocol-card" id="stepSerumCard">
+<span class="protocol-badge" id="serumBadge">Шаг 03 · Активный уход</span>
+<div class="card-content">
+<div class="p-image" id="serumImage"></div>
+<div class="p-info">
+<span class="p-step-num" id="serumStepNum">Таргетный актив</span>
+<h3 class="p-title" id="serumTitle">Сыворотка GLUT ME</h3>
+<p class="p-desc" id="serumDesc"></p>
+<div class="p-why" id="serumWhy"></div>
+<div class="p-buy">
+<div class="price-block">
+<span class="cur-price" id="serumPrice">~950–972 ₽ <small>Ozon</small></span>
+</div>
+<a href="https://ozon.ru/t/5DQJR6w" id="serumBtn" class="btn-item" target="_blank" rel="noopener">Купить на Ozon →</a>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ШАГ 4: ЗАПЕЧАТЫВАНИЕ И КРЕМ -->
+<div class="protocol-card">
+<span class="protocol-badge">Шаг 04 · Липидный замок и лифтинг</span>
+<div class="card-content">
+<div class="p-image img-cream"></div>
+<div class="p-info">
+<span class="p-step-num">Завершающий щит</span>
+<h3 class="p-title">Увлажняющий крем для лица GLUT HERO (50 мл)</h3>
+<p class="p-desc">Формула с глутатионом и пептидами. Запечатывает активы сыворотки, укрепляет овал лица, повышает плотность кожи и защищает от внешних стрессов.</p>
+<div class="p-why" id="creamWhy">
+<b>Зачем в схеме:</b> Без липидной защиты влага испаряется за 2 часа. Крем фиксирует 24-часовую защиту и поддерживает выработку собственного коллагена.
+</div>
+<div class="p-buy">
+<div class="price-block">
+<span class="cur-price">~1 798 ₽ <small>Ozon</small></span>
+</div>
+<a href="https://ozon.ru/t/3QZeDnX" class="btn-item" target="_blank" rel="noopener">Купить на Ozon →</a>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ШАГ 5: ВЕКИ -->
+<div class="protocol-card" id="eyeCard">
+<span class="protocol-badge" style="background:#4D5E66;">Зона вокруг глаз · Anti-Age</span>
+<div class="card-content">
+<div class="p-image img-eye"></div>
+<div class="p-info">
+<span class="p-step-num">Тонкая периорбитальная зона</span>
+<h3 class="p-title">Крем для век EYE HERO с церамидами (15 мл)</h3>
+<p class="p-desc">Пептидный комплекс с глутатионом и церамидами для тонкой зоны вокруг глаз: уменьшает выраженность мимических морщинок, освежает взгляд и защищает от сухости. Удобный тонкий носик-дозатор для точечного нанесения.</p>
+<div class="p-buy">
+<div class="price-block">
+<span class="cur-price">~678 ₽ <small>Ozon</small></span>
+</div>
+<a href="https://ozon.ru/t/RhXCpfD" class="btn-item" target="_blank" rel="noopener">Купить на Ozon →</a>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+<!-- СУММАРНЫЙ БЛОК -->
+<div class="total-summary">
+<h3>Собери всю систему в корзину на Ozon</h3>
+<p>Индивидуальная пошаговая программа домашнего ухода обойдётся примерно в <b>4 600 ₽</b> вместо десятков тысяч рублей за инъекции и болезненные процедуры.</p>
+<a href="https://ozon.ru/s/stolitsa-tsentr" class="total-ozon-btn" target="_blank" rel="noopener">Перейти в магазин GLUT ME на Ozon</a>
+</div>
+
+</div>
+</section>
+
+</div>
+</main>
+
+<footer class="site-footer hidden" id="siteFooter">
+<div class="wrap">
+<div class="f-links">
+<a href="https://ozon.ru/s/stolitsa-tsentr" target="_blank" rel="noopener">Каталог GLUT ME на Ozon</a>
+<a href="https://glutme.ru/" target="_blank" rel="noopener">Официальный сайт glutme.ru</a>
+<a href="https://YOUR_TELEGRAM_LINK_HERE" target="_blank" rel="noopener">Telegram-канал бренда</a>
+</div>
+<div class="f-copy">© 2026 GLUT ME | Все права защищены.</div>
+<p class="f-disc">Косметическая продукция индивидуального назначения. Не является лекарством. Перед применением рекомендуется тест на аллергическую реакцию.</p>
+</div>
+</footer>
+
+<script>
+(function(){
+"use strict";
+
+var detectedProfile = 'combo';
+
+var STEPS = [
+{
+kind: "question",
+id: "concern",
+q: "Какая ситуация с кожей описывает тебя точнее всего?",
+a: [
+"Только возрастные изменения: морщинки, птоз, сухость, тусклость (высыпаний нет)",
+"Только акне: воспаления, жирный блеск, чёрные точки и постакне (морщин нет)",
+"И то, и другое: первые заломы/потеря упругости + периодические прыщи и комедоны",
+"Кожа в сильном стрессе: серая, обезвоженная, пигментные пятна и неровный рельеф"
+]
+},
+{
+kind: "question",
+q: "Что происходит, когда ты пробуешь активный уход (ретинол, кислоты, плотные кремы)?",
+a: [
+"Кожа стягивается и сохнет ещё сильнее, морщины становятся заметнее",
+"Появляются подкожные прыщи, поры моментально забиваются",
+"Лицо горит, краснеет и шелушится — барьер просто «сгорает»",
+"Кремы лежат жирной плёнкой, но изнутри кожа остаётся обезвоженной"
+]
+},
+{
+kind: "question",
+q: "Посещаешь ли ты косметолога для решения этой проблемы?",
+a: [
+"Да, делаю уколы/биоревитализацию, но через 2 месяца эффект полностью спадает",
+"Боюсь филлеров, пастозности и уколов — ищу мощную домашнюю альтернативу",
+"Делала чистки и пилинги, но после них кожа истончилась и стала гиперчувствительной",
+"Ухаживаю дома сама, но баночки не дают того самого холёного «стеклянного» сияния"
+]
+},
+{
+kind: "loader",
+title: "Анализируем состояние кожи и гидролипидный баланс…"
+},
+{
+kind: "info",
+title: "Причина кроется глубже: влияние оксидативного стресса на клетки кожи.",
+body: "С возрастом и под воздействием стресса уровень естественных защитных антиоксидантов снижается. Если высыпаний нет — свободные радикалы разрушают волокна коллагена (дряблость и заломы). Если есть высыпания — кожный себум окисляется в порах (воспаления). Обычное базовое увлажнение не решает проблему окисления — необходима системная схема с глутатионом и пептидами.",
+button: "Посмотреть персональную схему"
+},
+{
+kind: "question",
+q: "Как выглядит твоё лицо при дневном свете без тонального крема?",
+a: [
+"Тусклый, «уставший» оттенок, выражены носогубки или сетка сухости",
+"Неровный рельеф: бугорки, расширенные поры и пятна постакне",
+"Жирный блеск в Т-зоне при сухих щеках и шелушениях",
+"В целом ровно, но не хватает сочности, плотности и тургора"
+]
+},
+{
+kind: "question",
+id: "goal",
+q: "Какая главная цель в уходе для тебя сейчас?",
+a: [
+"Укрепление овала, разглаживание заломов и плотность кожи (Anti-Age)",
+"Чистая кожа: уменьшить воспаления, поры и следы постакне",
+"Решить обе задачи сразу: ровный рельеф без воспалений и поддержка упругости",
+"Вернуть здоровый зеркальный тон (Glass Skin) и свежий цвет лица"
+]
+},
+{
+kind: "analyze",
+title: "Формируем схему ухода GLUT ME…",
+items: [
+"Подбор биосовместимой базы очищения",
+"Определение необходимой формулы сыворотки",
+"Фиксация пептидного комплекса для домашнего ухода"
+]
+},
+{
+kind: "result"
+},
+{
+kind: "transform"
+},
+{
+kind: "sell"
+}
+];
+
+var answers = new Array(STEPS.length).fill(null);
+var current = 0;
+
+var introBlock = document.getElementById("introBlock");
+var qArea = document.getElementById("qArea");
+var loaderArea = document.getElementById("loaderArea");
+var loaderTitle = document.getElementById("loaderTitle");
+var qTitle = document.getElementById("qTitle");
+var qOptions = document.getElementById("qOptions");
+var infoArea = document.getElementById("infoArea");
+var infoTitle = document.getElementById("infoTitle");
+var infoBody = document.getElementById("infoBody");
+var infoBtn = document.getElementById("infoBtn");
+var analyzeArea = document.getElementById("analyzeArea");
+var analyzeTitle = document.getElementById("analyzeTitle");
+var analyzeList = document.getElementById("analyzeList");
+var resultArea = document.getElementById("resultArea");
+var resultTitle = document.getElementById("resultTitle");
+var resultText = document.getElementById("resultText");
+var resultCards = document.getElementById("resultCards");
+var resultBtn = document.getElementById("resultBtn");
+var transformArea = document.getElementById("transformArea");
+var transformKicker = document.getElementById("transformKicker");
+var transformText = document.getElementById("transformText");
+var transformList = document.getElementById("transformList");
+var transformBtn = document.getElementById("transformBtn");
+var stage = document.getElementById("stage");
+var sellArea = document.getElementById("sellArea");
+var siteFooter = document.getElementById("siteFooter");
+
+var ICONS = {
+flame: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5Z"/></svg>',
+clock: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+down: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg>',
+warn: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>'
+};
+
+function remount(el, cls){ el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+
+function evaluateProfile(){
+var q0 = answers[0];
+var q5 = answers[5];
+if(q0 === 0 || q5 === 0){
+detectedProfile = 'antiage';
+} else if(q0 === 1 || q5 === 1){
+detectedProfile = 'acne';
+} else {
+detectedProfile = 'combo';
+}
+}
+
+function renderResult(){
+evaluateProfile();
+
+if(detectedProfile === 'antiage'){
+resultTitle.textContent = "Результат теста: Снижение упругости и дефицит антиоксидантов (Anti-Age)";
+resultText.textContent = "Высыпания отсутствуют, однако кожа испытывает оксидативный стресс. Свободные радикалы повреждают коллагеновый каркас, что приводит к потере тонуса, сухости и формированию заломов. Твоей коже необходим пептидный лифтинг и глубокая антиоксидантная поддержка.";
+resultCards.innerHTML = `
+<div class="r-card"><div class="r-head"><span class="r-ic">${ICONS.flame}</span><span class="r-label">Фактор стресса</span></div><p class="r-value">Снижение выработки коллагена и сухость</p></div>
+<div class="r-card"><div class="r-head"><span class="r-ic">${ICONS.clock}</span><span class="r-label">Потребность</span></div><p class="r-value">Восполнение пептидов и глутатиона</p></div>
+<div class="r-card"><div class="r-head"><span class="r-ic">${ICONS.down}</span><span class="r-label">Риск</span></div><p class="r-value">Углубление заломов и потеря чёткости овала</p></div>
+<div class="r-card"><div class="r-head"><span class="r-ic">${ICONS.warn}</span><span class="r-label">Рекомендация</span></div><p class="r-value">Сыворотка «Интенсивное питание» + крем GLUT HERO</p></div>
+`;
+} else if(detectedProfile === 'acne'){
+resultTitle.textContent = "Результат теста: Склонность к воспалениям и себостресс (Acne Stop)";
+resultText.textContent = "Кожный себум окисляется в порах при нехватке антиоксидантной защиты, провоцируя появление воспалений и неровного рельефа. Агрессивные спиртовые средства истончают барьер. Коже требуется мягкая себорегуляция и глутатион без чувства стянутости.";
+resultCards.innerHTML = `
+<div class="r-card"><div class="r-head"><span class="r-ic">${ICONS.flame}</span><span class="r-label">Фактор стресса</span></div><p class="r-value">Окисление липидов себума в порах</p></div>
+<div class="r-card"><div class="r-head"><span class="r-ic">${ICONS.clock}</span><span class="r-label">Следствие</span></div><p class="r-value">Воспаления и застойные следы постакне</p></div>
+<div class="r-card"><div class="r-head"><span class="r-ic">${ICONS.down}</span><span class="r-label">Риск</span></div><p class="r-value">Обезвоживание от агрессивных средств против прыщей</p></div>
+<div class="r-card"><div class="r-head"><span class="r-ic">${ICONS.warn}</span><span class="r-label">Рекомендация</span></div><p class="r-value">Сыворотка ACNE STOP + тонер FRESH UP</p></div>
+`;
+} else {
+resultTitle.textContent = "Результат теста: Комбинированное состояние (Anti-Age + Acne)";
+resultText.textContent = "Твоя кожа находится в двойном напряжении: агрессивные средства от прыщей сушат и подчеркивают морщинки, а плотные питательные кремы забивают поры. Требуется сбалансированная схема, которая мягко очищает поры и поддерживает упругость.";
+resultCards.innerHTML = `
+<div class="r-card"><div class="r-head"><span class="r-ic">${ICONS.flame}</span><span class="r-label">Фактор стресса</span></div><p class="r-value">Одновременное появление морщинок и воспалений</p></div>
+<div class="r-card"><div class="r-head"><span class="r-ic">${ICONS.clock}</span><span class="r-label">Потребность</span></div><p class="r-value">Баланс антиоксидантов без утяжеления пор</p></div>
+<div class="r-card"><div class="r-head"><span class="r-ic">${ICONS.down}</span><span class="r-label">Риск</span></div><p class="r-value">Чувствительность от неподходящего масс-маркета</p></div>
+<div class="r-card"><div class="r-head"><span class="r-ic">${ICONS.warn}</span><span class="r-label">Рекомендация</span></div><p class="r-value">Комплексная схема ухода GLUT ME</p></div>
+`;
+}
+resultBtn.textContent = "Посмотреть этапы ухода →";
+}
+
+function renderTransform(){
+evaluateProfile();
+
+if(detectedProfile === 'antiage'){
+transformKicker.textContent = "Твоя кожа через 28 дней Anti-Age ухода";
+transformText.textContent = "Ежедневная поддержка упругости глутатионом и пептидами в домашних условиях:";
+var pairs = [
+{ now: "Сухость и выраженная сетка заломов к вечеру", to: "Глубокая гидратация и наполненный тургор" },
+{ now: "Кратковременный эффект от случайных кремов", to: "Стабильный накопительный эффект упругости" },
+{ now: "Серый, землистый оттенок без косметики", to: "Естественное сияние чистой кожи (Glass Skin)" },
+{ now: "Сухость и мелкие морщинки в зоне вокруг глаз", to: "Свежий взгляд и увлажнённая периорбитальная зона" }
+];
+} else {
+transformKicker.textContent = "Твоя кожа через 28 дней ухода";
+transformText.textContent = "Пошаговая система GLUT ME для чистоты пор и здорового тона:";
+var pairs = [
+{ now: "Слой тонального крема каждое утро", to: "Ровный тон и сияние чистой кожи" },
+{ now: "Воспаления на фоне чувства стянутости", to: "Спокойная кожа без шелушений и жирного блеска" },
+{ now: "Откаты и сухость после агрессивных умывалок", to: "Стабильный защитный барьер" },
+{ now: "Хаотичная скупка неработающих баночек", to: "Понятная и логичная 4-этапная система" }
+];
+}
+
+transformList.innerHTML = "";
+pairs.forEach(function(pr){
+var row = document.createElement("div");
+row.className = "t-row";
+row.innerHTML =
+'<div class="t-card t-now"><span class="t-eyebrow">Сейчас</span><div class="t-line"><span class="mk mk-now"></span><span class="t-txt"></span></div></div>' +
+'<span class="t-arrow"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span>' +
+'<div class="t-card t-new"><span class="t-eyebrow">Через 28 дней с GLUT ME</span><div class="t-line"><span class="mk mk-new">✓</span><span class="t-txt"></span></div></div>';
+row.querySelector(".t-now .t-txt").textContent = pr.now;
+row.querySelector(".t-new .t-txt").textContent = pr.to;
+transformList.appendChild(row);
+});
+transformBtn.textContent = "Открыть подобранную программу ухода";
+}
+
+function adaptSellArea(){
+evaluateProfile();
+var sTitle = document.getElementById("sellTitle");
+var sSub = document.getElementById("sellSubtitle");
+var sImg = document.getElementById("serumImage");
+var sName = document.getElementById("serumTitle");
+var sDesc = document.getElementById("serumDesc");
+var sWhy = document.getElementById("serumWhy");
+var sBtn = document.getElementById("serumBtn");
+var sBadge = document.getElementById("serumBadge");
+var sStepNum = document.getElementById("serumStepNum");
+var sPrice = document.getElementById("serumPrice");
+
+var linkSerumAntiAge = "https://ozon.ru/t/3QZk81e";
+var linkSerumAcne = "https://ozon.ru/t/dwbKU7h";
+
+if(detectedProfile === 'antiage'){
+sTitle.textContent = "Твоя программа: Пептидный лифтинг и сияние (Anti-Age)";
+sSub.textContent = "Так как высыпания отсутствуют, схема сфокусирована на повышении плотности, защите коллагена и глубоком питании:";
+
+sBadge.textContent = "Шаг 03 · Интенсивный лифтинг и питание";
+sBadge.style.background = "linear-gradient(135deg, #00B8A9 0%, #00877C 100%)";
+sStepNum.textContent = "Антивозрастной актив";
+sName.textContent = "Сыворотка для лица увлажняющая «Интенсивное питание» (40 мл)";
+sDesc.textContent = "Высокоактивная формула с глутатионом и пептидным комплексом для глубокого увлажнения. Повышает тонус, устраняет сухость и возвращает коже упругость.";
+sWhy.innerHTML = "<b>Зачем в схеме:</b> Насыщает кожу пептидами и глутатионом, повышает плотность, глубоко увлажняет и помогает разгладить мелкую сетку морщинок от сухости.";
+sPrice.innerHTML = "~972 ₽ <small>Ozon</small>";
+sImg.className = "p-image img-serum-antiage";
+sBtn.href = linkSerumAntiAge;
+
+} else if(detectedProfile === 'acne'){
+sTitle.textContent = "Твоя программа: Себорегуляция и чистота пор (Acne Stop)";
+sSub.textContent = "Схема направлена на мягкое уменьшение воспалений, матирование и осветление постакне без пересушивания:";
+
+sBadge.textContent = "Шаг 03 · Себорегуляция и чистые поры";
+sBadge.style.background = "linear-gradient(135deg, #00B8A9 0%, #00877C 100%)";
+sStepNum.textContent = "Противовоспалительный актив";
+sName.textContent = "Сыворотка для проблемной кожи ACNE STOP (40 мл)";
+sDesc.textContent = "Глутатион + Ниацинамид + Гиалуронат натрия. Нормализует выработку кожного сала, сужает поры и постепенно осветляет следы постакне.";
+sWhy.innerHTML = "<b>Зачем в схеме:</b> Предотвращает окисление себума в порах, матирует Т-зону и помогает поддерживать чистоту лица.";
+sPrice.innerHTML = "~950 ₽ <small>Ozon</small>";
+sImg.className = "p-image img-serum-acne";
+sBtn.href = linkSerumAcne;
+
+} else {
+sTitle.textContent = "Твоя программа: Комплекс Anti-Age & Acne Stop";
+sSub.textContent = "Сбалансированная схема, которая помогает справиться с воспалениями, не пересушивая кожу и поддерживая её тонус:";
+
+sBadge.textContent = "Шаг 03 · Чистота пор и первые морщинки";
+sBadge.style.background = "linear-gradient(135deg, #00B8A9 0%, #00877C 100%)";
+sStepNum.textContent = "Комплексный актив";
+sName.textContent = "Сыворотка ACNE STOP с глутатионом (40 мл)";
+sDesc.textContent = "Комбинация глутатиона и ниацинамида: снижает воспаления, а благодаря пептидному комплексу сохраняет упругость кожи.";
+sWhy.innerHTML = "<b>Зачем в схеме:</b> Деликатно работает с воспалениями, не стягивая кожу и предотвращая появление сухих заломов.";
+sPrice.innerHTML = "~950 ₽ <small>Ozon</small>";
+sImg.className = "p-image img-serum-acne";
+sBtn.href = linkSerumAcne;
+}
+}
+
+function render(){
+var step = STEPS[current];
+var isSell = step.kind === "sell";
+stage.classList.toggle("hidden", isSell);
+sellArea.classList.toggle("hidden", !isSell);
+siteFooter.classList.toggle("hidden", !isSell);
+
+if(isSell){
+adaptSellArea();
+remount(sellArea, "landing");
+window.scrollTo({top:0, behavior:"smooth"});
+return;
+}
+
+introBlock.classList.toggle("hidden", current !== 0);
+loaderArea.classList.toggle("hidden", step.kind !== "loader");
+
+if(step.kind === "question"){
+infoArea.classList.add("hidden");
+qArea.classList.remove("hidden");
+remount(qArea, "q-area");
+qTitle.textContent = step.q;
+qOptions.innerHTML = "";
+step.a.forEach(function(text, i){
+var btn = document.createElement("button");
+btn.type = "button";
+btn.className = "option" + (answers[current] === i ? " selected" : "");
+btn.textContent = text;
+btn.addEventListener("click", function(){ choose(i); });
+qOptions.appendChild(btn);
+});
+} else if(step.kind === "loader"){
+qArea.classList.add("hidden");
+infoArea.classList.add("hidden");
+analyzeArea.classList.add("hidden");
+remount(loaderArea, "loader-area");
+loaderTitle.textContent = step.title;
+setTimeout(next, step.delay || 1800);
+} else if(step.kind === "info"){
+qArea.classList.add("hidden");
+infoArea.classList.remove("hidden");
+remount(infoArea, "info-area");
+infoTitle.textContent = step.title;
+infoBody.textContent = step.body;
+infoBtn.textContent = step.button;
+} else if(step.kind === "analyze"){
+qArea.classList.add("hidden");
+infoArea.classList.add("hidden");
+analyzeArea.classList.remove("hidden");
+remount(analyzeArea, "analyze-area");
+analyzeTitle.textContent = step.title;
+analyzeList.innerHTML = "";
+var rows = step.items.map(function(text){
+var row = document.createElement("div");
+row.className = "a-item pending";
+row.innerHTML = '<span class="ic"><span class="chk">✓</span></span><span class="a-text"></span>';
+row.querySelector(".a-text").textContent = text;
+analyzeList.appendChild(row);
+return row;
+});
+runAnalyze(rows, 1100, 500, next);
+} else if(step.kind === "result"){
+qArea.classList.add("hidden");
+infoArea.classList.add("hidden");
+analyzeArea.classList.add("hidden");
+resultArea.classList.remove("hidden");
+remount(resultArea, "result-area");
+renderResult();
+} else if(step.kind === "transform"){
+qArea.classList.add("hidden");
+infoArea.classList.add("hidden");
+analyzeArea.classList.add("hidden");
+resultArea.classList.add("hidden");
+transformArea.classList.remove("hidden");
+remount(transformArea, "transform-area");
+renderTransform();
+}
+window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function next(){
+current++;
+if(current < STEPS.length){ render(); }
+}
+
+function choose(i){
+answers[current] = i;
+var opts = qOptions.querySelectorAll(".option");
+opts.forEach(function(o, idx){ o.classList.toggle("selected", idx === i); });
+setTimeout(next, 220);
+}
+
+function runAnalyze(rows, perStep, doneDelay, cb){
+var i = 0;
+(function stepRun(){
+if(i >= rows.length){ setTimeout(cb, doneDelay); return; }
+var row = rows[i];
+row.classList.remove("pending");
+row.classList.add("loading");
+setTimeout(function(){
+row.classList.remove("loading");
+row.classList.add("done");
+i++;
+stepRun();
+}, perStep);
+})();
+}
+
+infoBtn.addEventListener("click", next);
+resultBtn.addEventListener("click", next);
+transformBtn.addEventListener("click", next);
+
+render();
+})();
+</script>
+</body>
+</html>
